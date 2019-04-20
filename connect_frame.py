@@ -2,6 +2,8 @@ from tkinter import (Label, Entry, Button, Frame)
 from tkinter.constants import *
 
 from serial import Serial, SerialException
+
+from receiver import Receiver
 from view import *
 
 
@@ -41,6 +43,7 @@ class ConnectFrame(Frame):
             self.port.port = port
             self.port.baudrate = baud
             self.port.open()
+            Receiver(self.port).start()
         except SerialException:
             status_text = "Не удалось открыть порт"
             status_color = 'darkred'
@@ -52,7 +55,6 @@ class ConnectFrame(Frame):
             status_color = 'darkgreen'
             self.entry_port.config(state='disabled')
             self.entry_baud.config(state='disabled')
-            self.root.bind('<Key-Control_R>', self.disconnect)
             self.btn_connect.configure(text="Отключиться",
                                        command=self.disconnect)
         finally:
@@ -68,7 +70,6 @@ class ConnectFrame(Frame):
             self.lbl_connect['fg'] = 'black'
             self.entry_port.config(state='normal')
             self.entry_baud.config(state='normal')
-            self.root.bind('<Key-Control_R>', self.connect)
             self.btn_connect.config(text="Подключиться",
                                        command=self.connect)
             self.root.after(4000, lambda:

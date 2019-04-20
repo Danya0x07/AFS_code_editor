@@ -1,6 +1,7 @@
 from tkinter import (Entry, Checkbutton, Button,
                      BooleanVar, Label, Frame, Text)
 from tkinter.constants import *
+from time import sleep
 
 from serial import SerialException
 
@@ -23,19 +24,26 @@ class SendFrame(Frame):
         self.text_send = Text(self, **text_send_view)
         self.btn_text_send = Button(self, **btn_text_send_view,
                                     command=self.send_text_msg)
-        self.lbl_status_send = Label(self, text=" ")
+        self.lbl_status = Label(self.root, text=" ", anchor=W, relief=SUNKEN)
+
+    def _place_widgets(self):
+        self.entry_send.grid(row=0, column=0, sticky=W)
+        self.btn_line_send.grid(row=1, column=0, columnspan=2, sticky=W)
+        self.text_send.grid(row=2, column=0, sticky=W)
+        self.btn_text_send.grid(row=3, column=0)
+        self.lbl_status.pack(side=BOTTOM, fill=X)
 
     def place_widgets(self):
-        self.entry_send.grid(columnspan=2, sticky=W)
-        self.btn_line_send.grid(row=0, column=2, sticky=W)
-        self.text_send.grid(row=1, column=0, sticky=W)
-        self.btn_text_send.grid(row=2, column=1)
-        self.lbl_status_send.grid(row=2, columnspan=2)
+        self.entry_send.pack(fill=X)
+        self.btn_line_send.pack(fill=X)
+        self.text_send.pack()
+        self.btn_text_send.pack(fill=X)
+        self.lbl_status.pack(side=BOTTOM, fill=X)
 
     def send_line_msg(self, event=None):
         msg = self.entry_send.get()
         try:
-            msg += '\r\n'
+            msg += '\r'
             msg = bytes(msg, 'ascii')
             self.port.write(msg)
         except UnicodeDecodeError:
@@ -53,27 +61,29 @@ class SendFrame(Frame):
             self._send_byte_line(byte_line)
 
     def _show_status_msg(self, error_text, color):
-        self.lbl_status_send.configure(text=error_text, fg=color)
+        self.lbl_status.configure(text=error_text, fg=color)
         self.root.after(4000, lambda:
-            self.lbl_status_send.configure(text=" ", fg='black'))
+            self.lbl_status.configure(text=" ", fg='black'))
 
     def _compile_code(self, code):
         program = []
         for line in code:
-            line = line.replace('\n', '\r\n')
+            line += '\r'
             try:
                 msg = bytes(line, 'ascii')
-            except UnicodeDecodeError:
+            except UnicodeEncodeError:
                 error_msg = "Некорректный ввод, строка {}".format(line)
                 self._show_status_msg(error_msg, "darkred")
                 return None
             else:
                program.append(msg)
+        program.pop()
         return program
 
     def _send_byte_line(self, byte_line):
         try:
             self.port.write(byte_line)
+            sleep(0.2)
         except SerialException:
             self._show_status_msg("Ошибка отправки", "darkred")
 

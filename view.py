@@ -30,7 +30,7 @@ btn_line_send_view = {
 }
 
 text_send_view = {
-    'width': 40,
+    'width': 80,
     'height': 20,
     'bd': 3,
     'font': 'consolas 11',
