@@ -1,5 +1,4 @@
-from tkinter import (Entry, Checkbutton, Button,
-                     BooleanVar, Label, Frame, Text)
+from tkinter import (Entry, Button, Label, Frame, Text)
 from tkinter.constants import *
 from time import sleep
 
@@ -25,11 +24,11 @@ class SendFrame(Frame):
         self.txt_sending_frame = Frame(self)
         self.btn_text_send = Button(self.txt_sending_frame, **btn_text_send_view,
                                     command=self.send_text_msg)
-
         Label(self.txt_sending_frame, text="Задержка, мс: ").grid(row=0, column=1)
         self.entry_delay = Entry(self.txt_sending_frame)
         self.entry_delay.insert(0, '50')
-        self.lbl_status = Label(self.root, text=" ", font='consolas 12 bold', anchor=W, relief=SUNKEN)
+        self.lbl_status = Label(self.root, text=" ", font='consolas 12 bold',
+                                anchor=W, relief=SUNKEN)
 
     def place_widgets(self):
         self.entry_send.pack(fill=X)
@@ -41,6 +40,7 @@ class SendFrame(Frame):
         self.lbl_status.pack(side=BOTTOM, fill=X)
 
     def send_line_msg(self, event=None):
+        '''Отправить строковую команду'''
         msg = self.entry_send.get()
         try:
             msg += '\r'
@@ -54,20 +54,17 @@ class SendFrame(Frame):
             self.entry_send.delete(0, END)
 
     def send_text_msg(self, event=None):
+        '''Отправить текст'''
         code = self.text_send.get(0.0, END).split('\n')
         program = self._compile_code(code)
-        delay = self.validate_entry_delay()
+        delay = self._validate_entry_delay()
         if program is None or delay is None: return
         for byte_line in program:
             self._send_byte_line(byte_line)
             sleep(delay / 1000)
 
-    def _show_status_msg(self, error_text, color):
-        self.lbl_status.configure(text=error_text, fg=color)
-        self.root.after(4000, lambda:
-            self.lbl_status.configure(text=" ", fg='black'))
-
     def _compile_code(self, code):
+        '''Проверить корректность кода'''
         program = []
         for line in code:
             line += '\r'
@@ -82,7 +79,21 @@ class SendFrame(Frame):
         program.pop()
         return program
 
-    def validate_entry_delay(self):
+    def _send_byte_line(self, byte_line):
+        '''Отправить строку через UART'''
+        try:
+            self.port.write(byte_line)
+        except SerialException:
+            self._show_status_msg("Ошибка отправки", "darkred")
+
+    def _show_status_msg(self, error_text, color):
+        '''Отобразить сообщение об ошибке в строке состояния'''
+        self.lbl_status.configure(text=error_text, fg=color)
+        self.root.after(4000, lambda:
+            self.lbl_status.configure(text=" ", fg='black'))
+
+    def _validate_entry_delay(self):
+        '''Проверить корректность введённой задержки'''
         try:
             val = self.entry_delay.get()
             val = int(val)
@@ -91,11 +102,4 @@ class SendFrame(Frame):
             return None
         else:
             return val
-
-    def _send_byte_line(self, byte_line):
-        try:
-            self.port.write(byte_line)
-        except SerialException:
-            self._show_status_msg("Ошибка отправки", "darkred")
-
 
