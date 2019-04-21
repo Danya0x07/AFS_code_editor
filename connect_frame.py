@@ -13,26 +13,23 @@ class ConnectFrame(Frame):
         super().__init__(root)
         self.root = root
         self.port = Serial(timeout=None)
-        self.create_widgets()
-        self.place_widgets()
-
-    def create_widgets(self):
-        self.lbl_port = Label(self, text="Порт: ")
-        self.lbl_baud = Label(self, text="Скорость: ")
+        self.lbl_port = Label(self, text="Порт: ", font='consolas 11 bold')
+        self.lbl_baud = Label(self, text="Скорость: ", font='consolas 11 bold')
 
         self.entry_port = Entry(self, **entry_port_view)
         self.entry_baud = Entry(self, **entry_baud_view)
         self.btn_connect = Button(self, **btn_connect_view,
                                   command=self.connect)
-        self.lbl_connect = Label(self, text=" ")
+        self.lbl_connect = Label(self, text=" ", font='consolas 11 bold')
 
-    def place_widgets(self):
+    def pack(self, **kwargs):
         self.lbl_port.grid(row=0, column=0, sticky=W)
         self.entry_port.grid(row=0, column=1)
         self.lbl_baud.grid(row=1, column=0)
         self.entry_baud.grid(row=1, column=1)
         self.btn_connect.grid(row=0, column=2, rowspan=2)
         self.lbl_connect.grid(row=2, columnspan=3)
+        super().pack(**kwargs)
 
     def connect(self, event=None):
         if self.port.is_open:

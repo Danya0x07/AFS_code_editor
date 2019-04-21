@@ -1,2 +1,7 @@
 *.geany
+*.f
+*.bat
+*.spec
 __pycache__
+build
+dist

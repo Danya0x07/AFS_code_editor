@@ -13,31 +13,29 @@ class SendFrame(Frame):
         super().__init__(root)
         self.root = root
         self.port = port
-        self.create_widgets()
-        self.place_widgets()
-
-    def create_widgets(self):
         self.entry_send = Entry(self, **entry_send_view)
         self.btn_line_send = Button(self, **btn_line_send_view,
                                command=self.send_line_msg)
-        self.text_send = Text(self, **text_send_view)
-        self.txt_sending_frame = Frame(self)
+        self.text_editor = Text(self, **text_editor_view)
+        self.txt_sending_frame = Frame(self.root)
         self.btn_text_send = Button(self.txt_sending_frame, **btn_text_send_view,
                                     command=self.send_text_msg)
-        Label(self.txt_sending_frame, text="Задержка, мс: ").grid(row=0, column=1)
-        self.entry_delay = Entry(self.txt_sending_frame)
+        Label(self.txt_sending_frame, text="\t\t\tЗадержка, мс: ",
+              font='consolas 11 bold').grid(row=0, column=1)
+        self.entry_delay = Entry(self.txt_sending_frame, font='consolas 11 bold')
         self.entry_delay.insert(0, '50')
-        self.lbl_status = Label(self.root, text=" ", font='consolas 12 bold',
+        self.lbl_status = Label(self.root, text=" ", font='consolas 11 bold',
                                 anchor=W, relief=SUNKEN)
 
-    def place_widgets(self):
+    def pack(self, **kwargs):
         self.entry_send.pack(fill=X)
         self.btn_line_send.pack(fill=X)
-        self.text_send.pack()
+        self.text_editor.pack(fill=BOTH)
         self.btn_text_send.grid(row=0, column=0)
         self.entry_delay.grid(row=0, column=2)
-        self.txt_sending_frame.pack(fill=X)
         self.lbl_status.pack(side=BOTTOM, fill=X)
+        self.txt_sending_frame.pack(side=BOTTOM, fill=X)
+        super().pack(**kwargs)
 
     def send_line_msg(self, event=None):
         '''Отправить строковую команду'''
@@ -55,7 +53,7 @@ class SendFrame(Frame):
 
     def send_text_msg(self, event=None):
         '''Отправить текст'''
-        code = self.text_send.get(0.0, END).split('\n')
+        code = self.text_editor.get(0.0, END).split('\n')
         program = self._compile_code(code)
         delay = self._validate_entry_delay()
         if program is None or delay is None: return
