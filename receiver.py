@@ -1,4 +1,5 @@
 from threading import Thread
+from serial import SerialException
 
 
 class Receiver(Thread):
@@ -8,8 +9,11 @@ class Receiver(Thread):
 
     def run(self):
         while self.port.is_open:
-            if self.port.in_waiting:
-                data = self.port.read()
-                data = data.decode('ascii', errors='ignore')
-                print(data, end='')
+            try:
+                if self.port.in_waiting:
+                    data = self.port.read()
+                    data = data.decode('ascii', errors='ignore')
+                    print(data, end='')
+            except SerialException:
+                break
 
