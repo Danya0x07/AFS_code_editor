@@ -41,3 +41,9 @@ btn_text_send_view = {
     'bd': 3,
     'font': 'consolas 11 bold',
 }
+
+btn_ctrl_z_view = {
+    'text': "Ctrl + Z",
+    'bd': 3,
+    'font': 'consolas 11 bold'
+}

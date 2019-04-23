@@ -20,10 +20,12 @@ class SendFrame(Frame):
         self.txt_sending_frame = Frame(self.root)
         self.btn_text_send = Button(self.txt_sending_frame, **btn_text_send_view,
                                     command=self.send_text_msg)
-        Label(self.txt_sending_frame, text="\t\t\tЗадержка, мс: ",
-              font='consolas 11 bold').grid(row=0, column=1)
+        Label(self.txt_sending_frame, text="\t\tЗадержка, мс: ",
+              font='consolas 11 bold').grid(row=0, column=2)
         self.entry_delay = Entry(self.txt_sending_frame, font='consolas 11 bold')
         self.entry_delay.insert(0, '50')
+        self.btn_ctrl_z = Button(self.txt_sending_frame, **btn_ctrl_z_view,
+                                 command=lambda: self._send_byte_line((26,)))
         self.lbl_status = Label(self.root, text=" ", font='consolas 11 bold',
                                 anchor=W, relief=SUNKEN)
 
@@ -32,12 +34,13 @@ class SendFrame(Frame):
         self.btn_line_send.pack(fill=X)
         self.text_editor.pack(fill=BOTH)
         self.btn_text_send.grid(row=0, column=0)
-        self.entry_delay.grid(row=0, column=2)
+        self.btn_ctrl_z.grid(row=0, column=1)
+        self.entry_delay.grid(row=0, column=3)
         self.lbl_status.pack(side=BOTTOM, fill=X)
         self.txt_sending_frame.pack(side=BOTTOM, fill=X)
         super().pack(**kwargs)
 
-    def send_line_msg(self, event=None):
+    def send_line_msg(self):
         '''Отправить строковую команду'''
         msg = self.entry_send.get()
         try:
@@ -51,7 +54,7 @@ class SendFrame(Frame):
         else:
             self.entry_send.delete(0, END)
 
-    def send_text_msg(self, event=None):
+    def send_text_msg(self):
         '''Отправить текст'''
         code = self.text_editor.get(0.0, END).split('\n')
         program = self._compile_code(code)

@@ -12,7 +12,7 @@ class ConnectFrame(Frame):
     def __init__(self, root):
         super().__init__(root)
         self.root = root
-        self.port = Serial(timeout=None)
+        self.port = Serial(timeout=None, interCharTimeout=2)
         self.lbl_port = Label(self, text="Порт: ", font='consolas 11 bold')
         self.lbl_baud = Label(self, text="Скорость: ", font='consolas 11 bold')
 
