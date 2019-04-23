@@ -1,6 +1,7 @@
 from tkinter import (Entry, Button, Label, Frame, Text)
 from tkinter.constants import *
 from time import sleep
+from os import system
 
 from serial import SerialException
 
@@ -15,19 +16,25 @@ class SendFrame(Frame):
         self.port = port
         self.entry_send = Entry(self, **entry_send_view)
         self.btn_line_send = Button(self, **btn_line_send_view,
-                               command=self.send_line_msg)
+            command=self.send_line_msg
+        )
         self.text_editor = Text(self, **text_editor_view)
         self.txt_sending_frame = Frame(self.root)
         self.btn_text_send = Button(self.txt_sending_frame, **btn_text_send_view,
-                                    command=self.send_text_msg)
-        Label(self.txt_sending_frame, text="\t\tЗадержка, мс: ",
-              font='consolas 11 bold').grid(row=0, column=2)
-        self.entry_delay = Entry(self.txt_sending_frame, font='consolas 11 bold')
+            command=self.send_text_msg
+        )
+        Label(self.txt_sending_frame, **lbl_delay_view).grid(row=0, column=3)
+        self.entry_delay = Entry(self.txt_sending_frame, **entry_delay_view)
         self.entry_delay.insert(0, '50')
         self.btn_ctrl_z = Button(self.txt_sending_frame, **btn_ctrl_z_view,
-                                 command=lambda: self._send_byte_line((26,)))
+            command=lambda: self._send_byte_line((26,))
+        )
+        self.btn_cls = Button(self.txt_sending_frame, **btn_cls_view,
+            command=lambda: system("cls")
+        )
         self.lbl_status = Label(self.root, text=" ", font='consolas 11 bold',
-                                anchor=W, relief=SUNKEN)
+            anchor=W, relief=SUNKEN
+        )
 
     def pack(self, **kwargs):
         self.entry_send.pack(fill=X)
@@ -35,7 +42,8 @@ class SendFrame(Frame):
         self.text_editor.pack(fill=BOTH)
         self.btn_text_send.grid(row=0, column=0)
         self.btn_ctrl_z.grid(row=0, column=1)
-        self.entry_delay.grid(row=0, column=3)
+        self.btn_cls.grid(row=0, column=2)
+        self.entry_delay.grid(row=0, column=4)
         self.lbl_status.pack(side=BOTTOM, fill=X)
         self.txt_sending_frame.pack(side=BOTTOM, fill=X)
         super().pack(**kwargs)
